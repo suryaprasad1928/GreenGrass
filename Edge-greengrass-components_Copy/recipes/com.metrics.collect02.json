@@ -1,0 +1,68 @@
+{
+    "RecipeFormatVersion": "2020-01-25",
+    "ComponentName": "#COMP_NAME#",
+    "ComponentVersion": "#COMP_VERSION#",
+    "ComponentType": "aws.greengrass.generic",
+    "ComponentDescription": "A component that does and sends inferencing on video frames at the edge ",
+    "ComponentPublisher": "AWS",
+    "ComponentConfiguration": {
+      "DefaultConfiguration": {
+        "accessControl": {
+          "aws.greengrass.ipc.mqttproxy": {
+            "#COMP_NAME#:pubsub:1": {
+              "policyDescription": "Allows access to publish inference topics.",
+              "operations": [
+                "aws.greengrass#PublishToIoTCore"
+              ],
+              "resources": [
+                "*"
+              ]
+            }
+          }
+        },
+        "input_uri": "rtsp://admin:Admin123@192.168.59.200/Streaming/Channels/202",
+        "additional_configs": "--sendmqtt --streamtos3 --mot",
+        "mqtt_base_path": "inference/results",
+        "send_frequency": 1,
+        "bucket_name": "store-analytics-image-upload",
+        "local_folder": "/home/lgeil/uploads",
+        "store_id": "store01",
+        "camera_id": "camera02"
+      }
+    },
+    "ComponentDependencies": {
+      "aws.greengrass.TokenExchangeService": {
+        "VersionRequirement": "^2.0.0",
+        "DependencyType": "HARD"
+      },
+      "aws.greengrass.StreamManager": {
+        "VersionRequirement": "^2.0.0"
+      },      
+      "com.metrics.dlmodels": {
+        "VersionRequirement": ">=1.0.0 <2.0.0",
+        "DependencyType": "HARD"
+      }
+    },
+    "Manifests": [
+      {
+        "Platform": {
+          "os": "linux",
+          "architecture": "aarch64"
+        },
+        "Lifecycle": {
+          "Run": "python3 -u {artifacts:decompressedPath}/#PREFIX_PATH#/app.py --input-uri {configuration:/input_uri} --bucket_name {configuration:/bucket_name} --local_folder {configuration:/local_folder} --store_id {configuration:/store_id} --camera_id {configuration:/camera_id} --send_frequency {configuration:/send_frequency} --mqtt_base_path {configuration:/mqtt_base_path} {configuration:/additional_configs} --modelpath {com.metrics.dlmodels:artifacts:decompressedPath}/jetson/jetson_nx"
+        },
+        "Artifacts": [
+          {
+            "Uri": "#UPDATE_ART_PATH#",
+            "Unarchive": "ZIP",
+            "Permission": {
+              "Read": "OWNER",
+              "Execute": "NONE"
+            }
+          }
+        ]
+      }
+    ],
+    "Lifecycle": {}
+  }

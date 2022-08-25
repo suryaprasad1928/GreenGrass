@@ -1,0 +1,7 @@
+numpy >= 1.17
+scipy >= 1.5
+numba == 0.48
+cupy == 9.4
+torch == 1.6
+torchvision == 0.7
+scikit-image==0.14.2

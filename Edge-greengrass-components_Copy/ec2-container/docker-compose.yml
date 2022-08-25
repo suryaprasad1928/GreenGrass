@@ -1,0 +1,29 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+version: '3.7'
+
+services:
+  greengrass:
+    init: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+              CUPY_NVCC_GENERATE_CODE: "arch=compute_75,code=sm_75"
+    container_name: aws-iot-greengrass
+    image: x86_64/aws-iot-greengrass:2.4.0
+    ports:
+      - "443:8043"
+      - "8883:8883"
+      - "8889:8888"
+    env_file: .env
+    volumes:  
+      - /workspace/pt-cli-creds:/root/.aws/:ro
+      - /workspace:/workspace
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+

@@ -1,0 +1,68 @@
+{
+    "RecipeFormatVersion": "2020-01-25",
+    "ComponentName": "#COMP_NAME#",
+    "ComponentVersion": "#COMP_VERSION#",
+    "ComponentType": "aws.greengrass.generic",
+    "ComponentDescription": "A component that does and sends inferencing on video frames at the edge ",
+    "ComponentPublisher": "AWS",
+    "ComponentConfiguration": {
+      "DefaultConfiguration": {
+        "accessControl": {
+          "aws.greengrass.ipc.mqttproxy": {
+            "#COMP_NAME#:pubsub:1": {
+              "policyDescription": "Allows access to publish inference topics.",
+              "operations": [
+                "aws.greengrass#PublishToIoTCore"
+              ],
+              "resources": [
+                "*"
+              ]
+            }
+          }
+        },
+        "input_uri": "/home/nvidia/sample/sample.webm",
+        "additional_configs": "--sendmqtt --streamtos3 --mot --txt sample/out1.log",
+        "mqtt_base_path": "inference/results",
+        "send_frequency": 1,
+        "bucket_name": "lgstoreimages",
+        "local_folder": "/home/nvidia/uploads",
+        "store_id": "store01",
+        "camera_id": "camera11"
+      }
+    },
+    "ComponentDependencies": {
+      "aws.greengrass.TokenExchangeService": {
+        "VersionRequirement": "^2.0.0",
+        "DependencyType": "HARD"
+      },
+      "aws.greengrass.StreamManager": {
+        "VersionRequirement": "^2.0.0"
+      },      
+      "com.objecttracking.modelstore": {
+        "VersionRequirement": ">=1.0.0 <2.0.0",
+        "DependencyType": "HARD"
+      }
+    },
+    "Manifests": [
+      {
+        "Platform": {
+          "os": "linux",
+          "architecture": "aarch64"
+        },
+        "Lifecycle": {
+          "Run": "python3 -u {artifacts:decompressedPath}/#PREFIX_PATH#/app.py --input-uri {configuration:/input_uri} --bucket_name {configuration:/bucket_name} --local_folder {configuration:/local_folder} --store_id {configuration:/store_id} --camera_id {configuration:/camera_id} --send_frequency {configuration:/send_frequency} --mqtt_base_path {configuration:/mqtt_base_path} {configuration:/additional_configs} --modelpath {com.objecttracking.modelstore:artifacts:decompressedPath}/jetson/onnx_models"
+        },
+        "Artifacts": [
+          {
+            "Uri": "#UPDATE_ART_PATH#",
+            "Unarchive": "ZIP",
+            "Permission": {
+              "Read": "OWNER",
+              "Execute": "NONE"
+            }
+          }
+        ]
+      }
+    ],
+    "Lifecycle": {}
+  }

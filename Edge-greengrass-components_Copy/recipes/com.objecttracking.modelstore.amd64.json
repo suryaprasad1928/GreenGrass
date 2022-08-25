@@ -1,0 +1,47 @@
+{
+    "RecipeFormatVersion": "2020-01-25",
+    "ComponentName": "#COMP_NAME#",
+    "ComponentVersion": "#COMP_VERSION#",
+    "ComponentType": "aws.greengrass.generic",
+    "ComponentDescription": "Downloads the object detection and tracking models for NVIDIA Jetson device to the device as artifacts.",
+    "ComponentPublisher": "AWS",
+    "ComponentConfiguration": {
+      "DefaultConfiguration": {
+        "user_name": "lgeil",
+        "additional_paths": ""
+      }
+    },
+    "ComponentDependencies": {
+      "aws.greengrass.Nucleus": {
+        "VersionRequirement": ">=2.0.0 <2.6.0",
+        "DependencyType": "SOFT"
+      }
+    },
+    "Manifests": [
+      {
+        "Platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "Lifecycle": {
+          "install": {
+            "RequiresPrivilege": "true",
+            "script": "\nbash {artifacts:decompressedPath}/#PREFIX_PATH#/init.sh {configuration:/user_name} {artifacts:decompressedPath}/#PREFIX_PATH#",
+            "timeout": "900"
+          }
+        },
+        "Artifacts": [
+          {
+            "Uri": "#UPDATE_ART_PATH#",
+            "Unarchive": "ZIP",
+            "Permission": {
+              "Read": "OWNER",
+              "Execute": "NONE"
+            }
+          }
+        ]
+      }
+    ],
+    "Lifecycle": {}
+  }
+  
